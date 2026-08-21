@@ -258,6 +258,9 @@ private:
 
     void sendRaceResultsToJS();
 
+    void notifyJSPlayerJoined(
+        std::shared_ptr<NetworkPlayerProfile> player);
+
     void checkRaceFinished();
     void getHitCaptureLimit();
     void configPeersStartTime();
