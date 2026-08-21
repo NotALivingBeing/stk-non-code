@@ -255,6 +255,9 @@ private:
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();
+
+    void sendRaceResultsToJS();
+
     void checkRaceFinished();
     void getHitCaptureLimit();
     void configPeersStartTime();
