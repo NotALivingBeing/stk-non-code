@@ -290,6 +290,73 @@ void ServerLobby::updateAddons()
 //-----------------------------------------------------------------------------
 /** Called whenever server is reset or game mode is changed.
  */
+
+void ServerLobby::readRanksFromJS(
+    const XMLNode* response)
+{
+    if (!response)
+        return;
+
+    std::lock_guard<std::mutex> lock(
+        m_custom_rank_mutex);
+
+    for (unsigned i = 0;
+         i < response->getNumNodes();
+         i++)
+    {
+        const XMLNode* node =
+            response->getNode(i);
+
+        if (!node ||
+            node->getName() != "player")
+        {
+            continue;
+        }
+
+        uint32_t id = 0;
+        uint32_t position = 0;
+
+        if (!node->get("id", &id))
+            continue;
+
+        if (!node->get(
+                "position",
+                &position))
+        {
+            continue;
+        }
+
+        if (position == 0)
+            continue;
+
+        m_custom_rank_cache[id].position =
+            position;
+    }
+}
+
+bool ServerLobby::getCustomRankPosition(
+    uint32_t online_id,
+    uint32_t* position)
+{
+    std::lock_guard<std::mutex> lock(
+        m_custom_rank_mutex);
+
+    auto it =
+        m_custom_rank_cache.find(
+            online_id);
+
+    if (it ==
+        m_custom_rank_cache.end())
+    {
+        return false;
+    }
+
+    *position =
+        it->second.position;
+
+    return true;
+}
+
 void ServerLobby::updateTracksForMode()
 {
     auto all_t = track_manager->getAllTrackIdentifiers();
