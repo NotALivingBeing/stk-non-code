@@ -2413,7 +2413,76 @@ void ServerLobby::computeNewRankings()
         double change = m_ranking->getDelta(id);
         m_result_ns->addFloat((float)change);
     }
-}   // computeNewRankings
+}
+
+void ServerLobby::sendRaceResultsToJS()
+{
+    // Only normal race / time-trial style modes have race times.
+    if (!RaceManager::get()->modeHasLaps())
+        return;
+
+    World* world = World::getWorld();
+
+    if (!world)
+        return;
+
+    auto request =
+        std::make_shared<Online::XMLRequest>(
+            Online::RequestManager::HTTP_MAX_PRIORITY);
+
+    request->setURL(
+        "http://127.0.0.1:39827/race");
+
+    const unsigned player_count =
+        RaceManager::get()->getNumPlayers();
+
+    request->addParameter(
+        "count",
+        player_count);
+
+    for (unsigned i = 0; i < player_count; i++)
+    {
+        const auto& player =
+            RaceManager::get()->getKartInfo(i);
+
+        const std::string prefix =
+            "p" +
+            StringUtils::toString(i) +
+            "_";
+
+        const bool dnf =
+            world->getKart(i)->isEliminated();
+
+        request->addParameter(
+            prefix + "id",
+            player.getOnlineId());
+
+        request->addParameter(
+            prefix + "name",
+            player.getPlayerName());
+
+        request->addParameter(
+            prefix + "dnf",
+            dnf ? 1 : 0);
+
+        if (!dnf)
+        {
+            request->addParameter(
+                prefix + "time",
+                RaceManager::get()
+                    ->getKartRaceTime(i));
+        }
+    }
+
+    request->executeNow();
+
+    if (!request->hadDownloadError() &&
+        request->isSuccess())
+    {
+        readRanksFromJS(
+            request->getXMLData());
+    }
+}// computeNewRankings
 //-----------------------------------------------------------------------------
 /** Called when a client disconnects.
  *  \param event The disconnect event.
