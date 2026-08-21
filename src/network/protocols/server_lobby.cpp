@@ -2364,6 +2364,8 @@ void ServerLobby::checkRaceFinished()
         computeNewRankings();
         submitRankingsToAddons();
     }
+	// Custom JavaScript ranking system.
+	sendRaceResultsToJS();
     m_state.store(WAIT_FOR_RACE_STOPPED);
 }   // checkRaceFinished
 
