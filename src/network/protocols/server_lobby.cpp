@@ -2973,6 +2973,12 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
     peer->setValidated(true);
+	// Tell ranking.js about every new player.
+	for (const auto& player :
+     	peer->getPlayerProfiles())
+	{
+    	notifyJSPlayerJoined(player);
+	}
 
     // send a message to the one that asked to connect
     NetworkString* server_info = getNetworkString(m_type);
