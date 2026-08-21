@@ -77,6 +77,23 @@ private:
         std::string m_country_code;
         bool m_tried = false;
     };
+    struct CustomRankInfo
+    {
+        uint32_t position = 0;
+    };
+
+    std::map<uint32_t, CustomRankInfo>
+        m_custom_rank_cache;
+
+    std::mutex
+        m_custom_rank_mutex;
+
+    void readRanksFromJS(
+        const XMLNode* response);
+
+    bool getCustomRankPosition(
+        uint32_t online_id,
+        uint32_t* position);
 
 #ifdef ENABLE_SQLITE3
     DatabaseConnector* m_db_connector;
