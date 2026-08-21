@@ -600,6 +600,37 @@ void ServerLobby::kickHost(Event* event)
         peer->kick();
 }   // kickHost
 
+void ServerLobby::notifyJSPlayerJoined(
+    std::shared_ptr<NetworkPlayerProfile> player)
+{
+    if (!player)
+        return;
+
+    auto request =
+        std::make_shared<Online::XMLRequest>(
+            Online::RequestManager::HTTP_MAX_PRIORITY);
+
+    request->setURL(
+        "http://127.0.0.1:39827/join");
+
+    request->addParameter(
+        "id",
+        player->getOnlineId());
+
+    request->addParameter(
+        "username",
+        player->getName());
+
+    request->executeNow();
+
+    if (!request->hadDownloadError() &&
+        request->isSuccess())
+    {
+        readRanksFromJS(
+            request->getXMLData());
+    }
+}
+
 //-----------------------------------------------------------------------------
 bool ServerLobby::notifyEventAsynchronous(Event* event)
 {
