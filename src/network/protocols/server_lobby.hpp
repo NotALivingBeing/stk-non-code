@@ -40,6 +40,7 @@ class NetworkItemManager;
 class NetworkString;
 class NetworkPlayerProfile;
 class STKPeer;
+class XMLNode;
 class SocketAddress;
 class Ranking;
 
